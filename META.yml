@@ -1,5 +1,5 @@
 ---
-abstract: 'Module abstract (<= 44 characters) goes here'
+abstract: 'Tool to manipulate palindromes numbers.'
 author:
   - 'Aureliano C. P. Guedes (guedes.aureliano@gmail.com)'
 build_requires:
@@ -19,4 +19,4 @@ no_index:
     - inc
 requires:
   Test::Simple: 0.44
-version: ''
+version: 0.02

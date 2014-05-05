@@ -7,7 +7,7 @@ WriteMakefile(
     NAME         => 'Math::Palindrome',
     VERSION_FROM => 'lib/Math/Palindrome.pm', # finds \$VERSION
     AUTHOR       => 'Aureliano C. P. Guedes (guedes.aureliano@gmail.com)',
-    ABSTRACT     => 'Module abstract (<= 44 characters) goes here',
+    ABSTRACT     => 'Tool to manipulate palindromes numbers.',
     PREREQ_PM    => {
                      'Test::Simple' => 0.44,
                     },

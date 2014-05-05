@@ -1,67 +1,96 @@
 package Math::Palindrome;
 
+#Yes, i'd like a dush good pratices
 use strict;
 use warnings;
-use Carp qw(croak);
+#And I so like fucking everything
+use Carp 'croak';
+#Let's help you work more easy, if you can't you may not be here, get out
 
-use base 'Exporter';
-our @EXPORT_OK = qw{is_palindrome next_palindrome previous_palindrome};
-
-sub is_palindrome {
-return 1 if ($_[0] == reverse $_[0]);
+BEGIN {
+    use Exporter;
+    use vars qw($VERSION @ISA @EXPORT @EXPORT_OK %EXPORT_TAGS);
+    $VERSION     = '0.02';
+    @ISA         = qw(Exporter);
+    #Give a hoot don't pollute, do not export more than needed by default
+    @EXPORT      = qw();
+    @EXPORT_OK   = qw(is_palindrome
+						next_palindrome 
+						previous_palindrome
+						increasing_sequence
+						decreasing_sequence
+						palindrome_after
+						palindrome_before);
+    %EXPORT_TAGS = (all => [ @EXPORT_OK ]);
 }
 
-#################### subroutine header begin ####################
+###########################################################################################
+# This cannot be export
 
-=head2 is_palindrome
+# How many digits exist here 
+sub _digits_size {return length shift}
 
- Usage     : print "Palindrome\n" if (is_palindrome($n));
- Purpose   : This function just return true if $n is equivalent to its reverse.
-
-=cut
-
-#################### subroutine header end ####################
-
-sub _digits_size {
-	my @dsize = split //, shift;
-	return scalar @dsize;
-}
-
+#Working with just one digits
+#If want a previous value
 sub _previous_one_digits {
 	my $n = shift;
 	$n != 0 ? (return ($n - 1)) : croak "Just work with natural numbers!\n";	
 }
-
+#If want a next value 
 sub _next_one_digits {
 	my $n = shift;
 	$n != 9 ? (return ($n + 1)) : (return 11);
 }
+#Finish, maybe one day I'll optimise 
 
+#Now other stance, working with odd digits 
+#for next 
 sub _next_odd_digits {
 	my $n = shift;
-	my $r ;
+	my $r;
 	
-	my $n_1 = substr $n, 0, scalar (split //, $n)/2; #first half part, without middle num(if exist)
-	my $n_2 = substr $n, -(scalar (split //, $n)/2); #second half part, without middle num(if exist)
-	my $n_3 = substr $n, 0, -(scalar (split //, $n)/2); #first half part, with middle num(if exist)
+	my $n_1 = substr $n, 0, (length $n)/2; #first half part, without middle num(if exist)
+	my $n_2 = substr $n, -((length $n)/2); #second half part, without middle num(if exist)
+	my $n_3 = substr $n, 0, -((length $n)/2); #first half part, with middle num(if exist)
 	
 	if ($n == 999){$r = 1001}
 	elsif ($n_1 <= reverse $n_2){
 		$n_3++;
-		$r = $n_3 . (reverse substr $n_3, 0, ((scalar (split //, $n_3))-1));
+		$r = $n_3 . (reverse substr $n_3, 0, ((length $n_3)-1));
 		
 	}
-	else{$r = $n_3 . (reverse substr $n_3, 0, ((scalar (split //, $n_3))-1))}
+	else{$r = $n_3 . (reverse substr $n_3, 0, ((length$n_3)-1))}
+	
+	return $r;
+}
+#for previous 
+sub _previous_odd_digits {
+	my $n = shift;
+	my $r ;
+	
+	my $n_1 = substr $n, 0, (length $n)/2; #first half part, without middle num(if exist)
+	my $n_2 = substr $n, -((length $n)/2); #second half part, without middle num(if exist)
+	my $n_3 = substr $n, 0, -((length $n)/2); #first half part, with middle num(if exist)
+	
+	if ($n <= 101){$r = 99}
+	elsif ($n_1 >= reverse $n_2){
+		$n_3--;
+		$r = $n_3 . (reverse substr $n_3, 0, ((length $n_3)-1));
+		
+	}
+	else{$r = $n_3 . (reverse substr $n_3, 0, ((length$n_3)-1))}
 	
 	return $r;
 }
 
+#Finally, working with even number
+#for next 
 sub _next_even_digits {
 	my $n = shift;
 	my $r;
 	
-	my $n_1 = substr $n, 0, -(scalar (split //, $n)/2);#first half part
-	my $n_2 = substr $n, (scalar (split //, $n)/2); #second half part
+	my $n_1 = substr $n, 0, -((length $n)/2);#first half part
+	my $n_2 = substr $n, ((length $n)/2); #second half part
 	
 	if ($n == 99){$r = 101}
 	elsif ($n_1 <= reverse$n_2){
@@ -72,32 +101,13 @@ sub _next_even_digits {
 	
 	return $r;
 }
-
-sub _previous_odd_digits {
-	my $n = shift;
-	my $r ;
-	
-	my $n_1 = substr $n, 0, scalar (split //, $n)/2; #first half part, without middle num(if exist)
-	my $n_2 = substr $n, -(scalar (split //, $n)/2); #second half part, without middle num(if exist)
-	my $n_3 = substr $n, 0, -(scalar (split //, $n)/2); #first half part, with middle num(if exist)
-	
-	if ($n <= 101){$r = 99}
-	elsif ($n_1 >= reverse $n_2){
-		$n_3--;
-		$r = $n_3 . (reverse substr $n_3, 0, ((scalar (split //, $n_3))-1));
-		
-	}
-	else{$r = $n_3 . (reverse substr $n_3, 0, ((scalar (split //, $n_3))-1))}
-	
-	return $r;
-}
-
+#for previous 
 sub _previous_even_digits {
 	my $n = shift;
 	my $r;
 	
-	my $n_1 = substr $n, 0, -(scalar (split //, $n)/2);#first half part
-	my $n_2 = substr $n, (scalar (split //, $n)/2); #second half part
+	my $n_1 = substr $n, 0, -((length $n)/2);#first half part
+	my $n_2 = substr $n, ((length $n)/2); #second half part
 	
 	if ($n <= 11){$r = 9}
 	elsif ($n_1 >= reverse $n_2){
@@ -108,7 +118,14 @@ sub _previous_even_digits {
 	
 	return $r;
 }
+#End, without these part, nothing may work
+##############################################################
 
+##############################################################
+#Now, all export functions
+#confirm if the number is palindrome 
+sub is_palindrome {($_[0] == reverse $_[0]) ? return 1 : return 0}
+#require the next palindrome 
 sub next_palindrome {
 	my $num = shift;
 	my $size = _digits_size($num);
@@ -116,14 +133,7 @@ sub next_palindrome {
 	elsif ($size % 2 != 0){return _next_odd_digits($num)}
 	else{return _next_even_digits($num)}
 }
-=head2 next_palindrome
-
- Usage     : next_palindrome(22);
- Returns   : 33
- Purpose   : This function just return true if $n is equivalent to its reverse.
-
-=cut
-
+#require the previous palindrome 
 sub previous_palindrome {
 	my $num = shift;
 	my $size = _digits_size($num);
@@ -131,43 +141,182 @@ sub previous_palindrome {
 	elsif ($size % 2 != 0){return _previous_odd_digits($num)}
 	else{return _previous_even_digits($num)}
 }
-=head2 next_palindrome
+#require a crescent sequence
+sub increasing_sequence {
+	my $len = $_[0];
+	my $ini = $_[1] || 0;
+	my @r;
+	for (1..$len){
+		$r[$_ - 1] = $ini = next_palindrome($ini)
+	}
+	return @r;
+}
+#require a decrescent sequence
+sub decreasing_sequence {
+	my $len = $_[0];
+	my $ini = $_[1] || 100;
+	my @r;
+	for (1..$len){
+		$r[$_ -1] = $ini = previous_palindrome($ini)
+	}
+	return @r;
+}
+#making more easy for the all asshole
+#require just last number of the decreasing sequence
+sub palindrome_before {
+	my $len = $_[0];
+	my $ini = $_[1] || 100;
+	my $r;
+	for (1..$len){
+		$r = $ini = previous_palindrome($ini)
+	}
+	return $r;
+}
+#require just last number of the increasing sequence
+sub palindrome_after {
+	my $len = $_[0];
+	my $ini = $_[1] || 0;
+	my $r;
+	for (1..$len){
+		$r = $ini = next_palindrome($ini)
+	}
+	return $r;
+}
+#Everything is dust in the wind
+#####################################################################
 
- Usage     : previous_palindrome(22);
- Returns   : 11
- Purpose   : This function just return true if $n is equivalent to its reverse.
 
-=cut	
-
-
+# Now the boring part, the documentation.
 
 
 =head1 NAME
 
-Palindrome - search and confirm palindromes numbers.
+Math::Palindrome - Tool to manipulate palindromes numbers.
 
 =head1 SYNOPSIS
 
-  use Palindrome qw/is_palindrome next_palindrome previous_palindrome/;
+  use Math::Palindrome qw/is_palindrome
+						next_palindrome 
+						previous_palindrome
+						increasing_sequence
+						decreasing_sequence
+						palindrome_after
+						palindrome_before/;
   
-  my $n = 22;
-  if(is_palindrome($n)){print "True!\n"}
-  else{print "False!\n"}
+  my $n = 42; #We sujest never use '05', just '5'
   
-  $n = next_palindrome($n); # $n is 33
+  is_palindrome($n) ? print "TRUE" :print "FALSE"; # false!
   
-  $n = previous_palindrome($n); # $n is 11
+  print next_palindrome($n); # 44
+  
+  print previous_palindrome($n); # 33
+  
+  #to increasing_sequence and decreasing_sequence insert 
+  # the size of sequence
+  my @sequence_01 = increasing_sequence(5, $n); # 44 55 66 77 88
+  #or
+  my @sequence_01 = increasing_sequence(5); # 1 2 3 4 5
+  # default is 0 
+  my @sequence_02 = decreasing_sequence(5, $n); # 33 22 11 9 8
+  #or 
+  my @sequence_02 = decreasing_sequence(5); # 99 88 77 66 55
+  #default is 100
+  
+  my $last = palindrome_after(5, $n); # 88
+  # is the same $last = increasing_sequence(5, $n); 
+  # this is valid too
+  my $last = palindrome_after(5); # 5
+  
+  my $first = palindrome_before(5, $n); # 8
+  # is the same $first = decreasing_sequence(5, $n); 
+  # this is valid too  
+  my $first = palindrome_before(5); # 55
 
 
 =head1 DESCRIPTION
 
-You can use this module to find and confirm palindrome numbers.
+This module is a alternative agains Math::NumSeq::Palindromes.
+Can use this to find and confirm palindrome numbers.
+In my tests it's work correctly with small and large numbers.
+The most largest numbers was 9,99999 * 10^19. But, I think that its involved a memory capacity.
+In this module, I used a deterministc method, maybe you can think that is a heuristic, but not.
+I'm ready for fix a report bugs.
 
-Blah blah blah.
+=head2 is_palindrome
+
+ Usage     : is_palindrome($n)
+ Purpose   : verify if the number is palindrome or not
+ Returns   : return 1 if true or 0 if false
+ Comment   : is the same:
+  ($n == reverse $n) ? return 1 : return 0
+=cut
+
+=head2 next_palindrome
+
+ Usage     : next_palindrome($n);
+ Purpose   : return the next palindrome number after $n
+
+=cut
+
+=head2 previous_palindrome
+
+ Usage     : previous_palindrome($n);
+ Purpose   : return the previous palindrome number before $n
+
+=cut
+
+=head2 increasing_sequence
+
+ Usage     : increasing_sequence($size, $first_value);
+ Purpose   : return the crescent sequence of palindrome number after $n
+ Argument  : $size is the number of palindromes that you want
+           : $first_value is the number where it start to work, default it is 0 and never return the $first_value 
+ Throws    : Don't return $first_value even it's palindrome
+ Comment   : Use with array.
 
 
-=head1 USAGE
+=cut
 
+=head2 decreasing_sequence
+
+ Usage     : decreasing_sequence($size, $first_value);
+ Purpose   : return the decrescent sequence of palindrome number beforer $n
+ Argument  : $size is the number of palindromes that you want
+           : $first_value is the number where it start to work, default it is 100 and never return the $first_value 
+ Throws    : Don't return $first_value even it's palindrome
+ Comment   : Use with array;
+
+
+=cut
+
+=head2 palindrome_after
+
+ Usage     : palindrome_after($size, $first_value);
+ Purpose   : return the last number of crescent sequence of palindrome number beforer $n
+ Argument  : $size is the number of palindromes that you want
+           : $first_value is the number where it start to work, default it is 100 and never return the $first_value 
+ Throws    : Don't return $first_value even it's palindrome
+ Comment   : Is like:
+  $n = increasing_sequence($s, $p);
+
+ 
+=cut
+
+=head2 palindrome_before
+
+ Usage     : palindrome_before($size, $first_value);
+ Purpose   : return the last number of decrescent sequence of palindrome number beforer $n
+ Argument  : $size is the number of palindromes that you want
+           : $first_value is the number where it start to work, default it is 0 and never return the $first_value 
+ Throws    : Don't return $first_value even it's palindrome
+ Comment   : Is like:
+  $n = decreasing_sequence($s, $p);
+
+=cut
+
+
+=head1 THANKS
+Bruno Buss and all community of rio.pm.org
 
 
 =head1 AUTHOR
@@ -193,7 +342,4 @@ perl(1).
 
 #################### main pod documentation end ###################
 
-
-1;
-# The preceding line will help the module return a true value
-
+'Warning! The consumption of alcohol may cause you to think you have mystical kung-fu powers.';
